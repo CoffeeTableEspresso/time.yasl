@@ -1,0 +1,8 @@
+name = "time"
+authors = [ "CoffeeTableEspresso <coffeetableespresso@gmail.com>" ]
+version = "v0.1.0"
+
+[build]
+sources = [ "time.c" ]
+
+[deps]
