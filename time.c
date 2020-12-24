@@ -28,10 +28,13 @@ static void YASL_pushtime(struct YASL_State *S, time_t time) {
 }
 
 static void YASL_time_tostr(struct YASL_State *S) {
+    char buff[26];
     time_t *time = YASLX_checktime(S, "time.tostr", 0);
-    const char *tmp = ctime(time);
-    char *buffer = malloc(strlen(tmp) + 1);
-    strcpy(buffer, tmp);
+    size_t len = strftime(buff, sizeof buff , "%FT%T+%z", ctime(gmtime(time)));
+    buff[len] = '\0';
+
+    char *buffer = malloc(strlen(buff) + 1);
+    strcpy(buffer, buff);
     YASL_pushszstring(S, buffer);
 }
 
