@@ -30,7 +30,7 @@ static void YASL_pushtime(struct YASL_State *S, time_t time) {
 static void YASL_time_tostr(struct YASL_State *S) {
     char buff[26];
     time_t *time = YASLX_checktime(S, "time.tostr", 0);
-    size_t len = strftime(buff, sizeof buff , "%FT%T+%z", gmtime(time));
+    size_t len = strftime(buff, sizeof buff , "%FT%T%z", gmtime(time));
     buff[len] = '\0';
 
     char *buffer = malloc(strlen(buff) + 1);
