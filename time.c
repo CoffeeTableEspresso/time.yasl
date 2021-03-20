@@ -9,7 +9,7 @@ static const char *TIME_NAME = "time";
 static time_t *YASLX_checktime(struct YASL_State *S, const char *name, int pos) {
     if (!YASL_isuserdata(S, TIME_NAME)) {
         YASL_print_err(S, "TypeError: %s expected arg in position %d to be of type time, got arg of type %s.",
-                name, pos, YASL_peektypestr(S));
+                name, pos, YASL_peektypename(S));
         YASL_throw_err(S, YASL_TYPE_ERROR);
     }
     return (time_t *)YASL_popuserdata(S);
@@ -22,7 +22,7 @@ static time_t *allocate_time(time_t time) {
 }
 
 static void YASL_pushtime(struct YASL_State *S, time_t time) {
-    YASL_pushuserdata(S, allocate_time(time), T_TIME, free);
+    YASL_pushuserdata(S, allocate_time(time), TIME_NAME, free);
     YASL_loadmt(S, TIME_PRE);
     YASL_setmt(S);
 }
