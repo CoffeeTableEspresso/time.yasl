@@ -23,7 +23,7 @@ static time_t *allocate_time(time_t time) {
 
 static void YASL_pushtime(struct YASL_State *S, time_t time) {
     YASL_pushuserdata(S, allocate_time(time), TIME_NAME, free);
-    YASL_loadmt(S, TIME_PRE);
+    YASL_loadmt(S, TIME_NAME);
     YASL_setmt(S);
 }
 
