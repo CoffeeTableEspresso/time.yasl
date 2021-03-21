@@ -6,42 +6,45 @@
 #define TIME_PRE "time"
 static const char *TIME_NAME = "time";
 
-static time_t *YASLX_checktime(struct YASL_State *S, const char *name, int pos) {
-    if (!YASL_isuserdata(S, TIME_NAME)) {
-        YASL_print_err(S, "TypeError: %s expected arg in position %d to be of type time, got arg of type %s.",
-                name, pos, YASL_peektypename(S));
-        YASL_throw_err(S, YASL_TYPE_ERROR);
-    }
-    return (time_t *)YASL_popuserdata(S);
+struct YASL_Time {
+	time_t time;
+	int milliseconds;
+};
+
+static struct YASL_Time *YASLX_checktime(struct YASL_State *S, const char *name, int pos) {
+	if (!YASL_isuserdata(S, TIME_NAME)) {
+		YASL_print_err(S, "TypeError: %s expected arg in position %d to be of type time, got arg of type %s.",
+			       name, pos, YASL_peektypename(S));
+		YASL_throw_err(S, YASL_TYPE_ERROR);
+	}
+	return (struct YASL_Time *) YASL_popuserdata(S);
 }
 
-static time_t *allocate_time(time_t time) {
-    time_t *ptr = malloc(sizeof(time_t));
-    *ptr = time;
-    return ptr;
+static struct YASL_Time *allocate_time(time_t time, int milliseconds) {
+	struct YASL_Time *ptr = malloc(sizeof(struct YASL_Time));
+	*ptr = ((struct YASL_Time) {.time = time, .milliseconds = milliseconds});
+	return ptr;
 }
 
-static void YASL_pushtime(struct YASL_State *S, time_t time) {
-    YASL_pushuserdata(S, allocate_time(time), TIME_NAME, free);
-    YASL_loadmt(S, TIME_NAME);
-    YASL_setmt(S);
+static void YASL_pushtime(struct YASL_State *S, time_t time, int milliseconds) {
+	YASL_pushuserdata(S, allocate_time(time, milliseconds), TIME_NAME, free);
+	YASL_loadmt(S, TIME_NAME);
+	YASL_setmt(S);
 }
 
 static int YASL_time_tostr(struct YASL_State *S) {
-    char buff[26];
-    time_t *time = YASLX_checktime(S, "time.tostr", 0);
-    size_t len = strftime(buff, sizeof buff , "%FT%T%z", gmtime(time));
-    buff[len] = '\0';
+	char buff[30]; // 26 for the standard C stuff, 1 for decimal place, 3 more for milliseconds.
+	struct YASL_Time *time = YASLX_checktime(S, "time.tostr", 0);
+	size_t len = strftime(buff, sizeof buff, "%FT%T%z", gmtime(&time->time));
+	buff[len] = '\0';
 
-    char *buffer = malloc(strlen(buff) + 1);
-    strcpy(buffer, buff);
-    YASL_pushzstr(S, buffer);
-    return 1;
+	YASL_pushzstr(S, buff);
+	return 1;
 }
 
 static int YASL_time_now(struct YASL_State *S) {
-    YASL_pushtime(S, time(NULL));
-    return 1;
+	YASL_pushtime(S, time(NULL), 0);
+	return 1;
 }
 
 void YASL_load_dyn_lib(struct YASL_State *S) {
