@@ -1,0 +1,7 @@
+const time = __require_c__('time')
+
+const first = time.parse('2000-09-07T00:00:00Z')
+const second = time.parse('1996-12-15T00:00:00Z')
+
+echo first - second
+echo second - first
