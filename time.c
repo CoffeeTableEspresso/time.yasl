@@ -46,9 +46,21 @@ static struct YASL_Time *allocate_time(time_t time, int milliseconds) {
 	return ptr;
 }
 
+static struct YASL_TimeDelta *allocate_timedelta(long seconds, int milliseconds) {
+	struct YASL_TimeDelta *ptr = malloc(sizeof(struct YASL_TimeDelta));
+	*ptr = ((struct YASL_TimeDelta) {.diff = seconds, .milliseconds = milliseconds});
+	return ptr;
+}
+
 static void YASL_pushtime(struct YASL_State *S, time_t time, int milliseconds) {
 	YASL_pushuserdata(S, allocate_time(time, milliseconds), TIME_NAME, free);
 	YASL_loadmt(S, TIME_NAME);
+	YASL_setmt(S);
+}
+
+static void YASL_pushtimedelta(struct YASL_State *S, long seconds, int milliseconds) {
+	YASL_pushuserdata(S, allocate_timedelta(seconds, milliseconds), TIME_DELTA_NAME, free);
+	YASL_loadmt(S, TIME_DELTA_NAME);
 	YASL_setmt(S);
 }
 
@@ -140,13 +152,8 @@ int YASL_time___sub(struct YASL_State *S) {
 		diff++;
 	}
 
-	struct YASL_TimeDelta *timedelta = malloc(sizeof(struct YASL_TimeDelta));
-	timedelta->diff = (long)diff;
-	timedelta->milliseconds = ms_diff;
+	YASL_pushtimedelta(S, (long)diff, ms_diff);
 
-	YASL_pushuserdata(S, timedelta, TIME_DELTA_NAME, free);
-	YASL_loadmt(S, TIME_DELTA_NAME);
-	YASL_setmt(S);
 	return 1;
 }
 
@@ -160,6 +167,43 @@ int YASL_timedelta_tostr(struct YASL_State *S) {
 	buffer[len] = '\0';
 
 	YASL_pushzstr(S, buffer);
+	return 1;
+}
+
+int YASL_timedelta_frommilliseconds(struct YASL_State *S) {
+	yasl_int milliseconds = YASLX_checknint(S, TIME_PRE ".frommilliseconds", 0);
+
+	long seconds = milliseconds / 1000;
+	milliseconds %= 1000;
+
+	YASL_pushtimedelta(S, seconds, milliseconds);
+
+	return 1;
+}
+
+int YASL_timedelta_fromseconds(struct YASL_State *S) {
+	yasl_int seconds = YASLX_checknint(S, TIME_PRE ".fromseconds", 0);
+
+	YASL_pushtimedelta(S, seconds, 0);
+
+	return 1;
+}
+
+int YASL_timedelta_fromminutes(struct YASL_State *S) {
+	yasl_int minutes = YASLX_checknint(S, TIME_PRE ".fromminutes", 0);
+
+	long seconds = minutes * 60;
+	YASL_pushtimedelta(S, seconds, 0);
+
+	return 1;
+}
+
+int YASL_timedelta_fromhours(struct YASL_State *S) {
+	yasl_int hours = YASLX_checknint(S, TIME_PRE ".fromhours", 0);
+
+	long seconds = hours * 60 * 60;
+	YASL_pushtimedelta(S, seconds, 0);
+
 	return 1;
 }
 
@@ -196,5 +240,26 @@ void YASL_load_dyn_lib(struct YASL_State *S) {
 
 	YASL_pushlit(S, "time");
 	YASL_pushcfunction(S, YASL_time_time, 7);
+	YASL_tableset(S);
+
+	YASL_pushlit(S, "timedelta");
+	YASL_pushtable(S);
+
+	YASL_pushlit(S, "frommilliseconds");
+	YASL_pushcfunction(S, YASL_timedelta_frommilliseconds, 1);
+	YASL_tableset(S);
+
+	YASL_pushlit(S, "fromseconds");
+	YASL_pushcfunction(S, YASL_timedelta_fromseconds, 1);
+	YASL_tableset(S);
+
+	YASL_pushlit(S, "fromminutes");
+	YASL_pushcfunction(S, YASL_timedelta_fromminutes, 1);
+	YASL_tableset(S);
+
+	YASL_pushlit(S, "fromhours");
+	YASL_pushcfunction(S, YASL_timedelta_fromhours, 1);
+	YASL_tableset(S);
+
 	YASL_tableset(S);
 }
