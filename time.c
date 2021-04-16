@@ -161,9 +161,9 @@ int YASL_timedelta_tostr(struct YASL_State *S) {
 	struct YASL_TimeDelta *td = YASLX_checktimedelta(S, TIME_DELTA_PRE "tostr", 1);
 
 	char *buffer = NULL;
-	int len = snprintf(NULL, 0, "%ld.%03ds", td->diff, td->milliseconds);
+	int len = snprintf(NULL, 0, "timedelta(%ld.%03d)", td->diff, td->milliseconds);
 	buffer = realloc(buffer, len + 1);
-	snprintf(buffer, len + 1, "%ld.%03ds", td->diff, td->milliseconds);
+	snprintf(buffer, len + 1, "timedelta(%ld.%03d)", td->diff, td->milliseconds);
 	buffer[len] = '\0';
 
 	YASL_pushzstr(S, buffer);
