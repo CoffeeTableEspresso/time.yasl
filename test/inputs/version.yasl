@@ -1,0 +1,3 @@
+const time = require('time')
+
+echo time.__VERSION__

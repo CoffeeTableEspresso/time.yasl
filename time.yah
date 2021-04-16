@@ -18,4 +18,5 @@ export {
         fromminutes(int) -> timedelta
         fromhours(int) -> timedelta
     }
+    __VERSION__ -> str
 }
