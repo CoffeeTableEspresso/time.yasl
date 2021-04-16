@@ -1,0 +1,6 @@
+const time = __require_c__('time')
+
+echo time.timedelta.frommilliseconds(2345)
+echo time.timedelta.fromseconds(100)
+echo time.timedelta.fromminutes(2)
+echo time.timedelta.fromhours(1)

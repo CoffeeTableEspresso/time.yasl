@@ -1,0 +1,4 @@
+timedelta(2.345)
+timedelta(100.000)
+timedelta(120.000)
+timedelta(3600.000)

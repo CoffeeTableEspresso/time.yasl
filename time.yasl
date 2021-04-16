@@ -1,0 +1,1 @@
+export __require_c__('time')  | { .__VERSION__: 'v0.1.0' }

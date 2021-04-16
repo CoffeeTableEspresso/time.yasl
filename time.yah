@@ -1,0 +1,22 @@
+
+type time {
+    tostr(self) -> str
+    time - time -> timedelta
+}
+
+type timedelta {
+    tostr(self) -> str
+}
+
+export {
+    now() -> time
+    parse(str) -> time
+    time(int, int, int, int, int, int, int) -> time
+    timedelta {
+        frommilliseconds(int) -> timedelta
+        fromseconds(int) -> timedelta
+        fromminutes(int) -> timedelta
+        fromhours(int) -> timedelta
+    }
+    __VERSION__ -> str
+}
