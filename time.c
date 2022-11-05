@@ -52,14 +52,24 @@ static struct YASL_TimeDelta *allocate_timedelta(long seconds, int milliseconds)
 	return ptr;
 }
 
+static void free_time(struct YASL_State *S, struct YASL_Time *time) {
+    (void) S;
+    free(time);
+}
+
+static void free_timedelta(struct YASL_State *S, struct YASL_TimeDelta *timedelta) {
+    (void) S;
+    free(timedelta);
+}
+
 static void YASL_pushtime(struct YASL_State *S, time_t time, int milliseconds) {
-	YASL_pushuserdata(S, allocate_time(time, milliseconds), TIME_NAME, free);
+	YASL_pushuserdata(S, allocate_time(time, milliseconds), TIME_NAME, (void(*)(struct YASL_State *, void *))free_time);
 	YASL_loadmt(S, TIME_NAME);
 	YASL_setmt(S);
 }
 
 static void YASL_pushtimedelta(struct YASL_State *S, long seconds, int milliseconds) {
-	YASL_pushuserdata(S, allocate_timedelta(seconds, milliseconds), TIME_DELTA_NAME, free);
+	YASL_pushuserdata(S, allocate_timedelta(seconds, milliseconds), TIME_DELTA_NAME, (void(*)(struct YASL_State *, void *))free_timedelta);
 	YASL_loadmt(S, TIME_DELTA_NAME);
 	YASL_setmt(S);
 }
