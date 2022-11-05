@@ -45,9 +45,9 @@ static struct YASL_Time *allocate_time(time_t time, int milliseconds) {
 	return ptr;
 }
 
-static struct YASL_TimeDelta *allocate_timedelta(long seconds, int milliseconds) {
+static struct YASL_TimeDelta *allocate_timedelta(long long milliseconds) {
 	struct YASL_TimeDelta *ptr = malloc(sizeof(struct YASL_TimeDelta));
-	*ptr = ((struct YASL_TimeDelta) { .milliseconds = seconds * 1000 + milliseconds});
+	*ptr = ((struct YASL_TimeDelta) { .milliseconds = milliseconds});
 	return ptr;
 }
 
@@ -67,8 +67,8 @@ static void YASL_pushtime(struct YASL_State *S, time_t time, int milliseconds) {
 	YASL_setmt(S);
 }
 
-static void YASL_pushtimedelta(struct YASL_State *S, int milliseconds) {
-	YASL_pushuserdata(S, allocate_timedelta(milliseconds / 1000, milliseconds % 1000), TIME_DELTA_NAME, (void(*)(struct YASL_State *, void *))free_timedelta);
+static void YASL_pushtimedelta(struct YASL_State *S, long long milliseconds) {
+	YASL_pushuserdata(S, allocate_timedelta(milliseconds), TIME_DELTA_NAME, (void(*)(struct YASL_State *, void *))free_timedelta);
 	YASL_loadmt(S, TIME_DELTA_NAME);
 	YASL_setmt(S);
 }
@@ -150,19 +150,10 @@ int YASL_time___sub(struct YASL_State *S) {
 	struct YASL_Time *right = YASLX_checktime(S, TIME_PRE ".__sub", 1);
 	struct YASL_Time *left = YASLX_checktime(S, TIME_PRE ".__sub", 0);
 
-	double diff = difftime(left->time, right->time);
+	long long diff = (long long)difftime(left->time, right->time);
 	int ms_diff = left->milliseconds - right->milliseconds;
-	while (ms_diff < 0) {
-		ms_diff += 1000;
-		diff--;
-	}
-	while (ms_diff >= 1000) {
-		ms_diff -= 1000;
-		diff++;
-	}
 
-	YASL_pushtimedelta(S, (long)diff * 1000 + ms_diff);
-
+	YASL_pushtimedelta(S, diff * 1000 + ms_diff);
 	return 1;
 }
 
