@@ -100,7 +100,7 @@ static int YASL_time_parse(struct YASL_State *S) {
 	int n = 0;
 
 	int written = sscanf(str, "%d-%d-%dT%d:%d:%fZ%n", &y, &M, &d, &h, &m, &s, &n);
-	if (written == 6 && n == strlen(str)) {
+	if (written == 6 && n == (int)strlen(str)) {
 		struct tm time= { .tm_year = y - 1900, .tm_mon = M - 1, .tm_mday = d, .tm_hour = h, .tm_min = m, .tm_sec = (int)truncf(s)};
 		int ms = (int)truncf((s - truncf(s)) * 1000);
 
@@ -110,7 +110,7 @@ static int YASL_time_parse(struct YASL_State *S) {
 
 	int lh, lm;
 	written = sscanf(str, "%d-%d-%dT%d:%d:%f+%d:%d%n", &y, &M, &d, &h, &m, &s, &lh, &lm, &n);
-	if (written == 8 && n == strlen(str)) {
+	if (written == 8 && n == (int)strlen(str)) {
 		struct tm time= { .tm_year = y - 1900, .tm_mon = M - 1, .tm_mday = d, .tm_hour = h - lh, .tm_min = m - lm, .tm_sec = (int)truncf(s)};
 		int ms = (int)truncf((s - truncf(s)) * 1000);
 
@@ -119,7 +119,7 @@ static int YASL_time_parse(struct YASL_State *S) {
 	}
 
 	written = sscanf(str, "%d-%d-%dT%d:%d:%f-%d:%d%n", &y, &M, &d, &h, &m, &s, &lh, &lm, &n);
-	if (written == 8 && n == strlen(str)) {
+	if (written == 8 && n == (int)strlen(str)) {
 		struct tm time= { .tm_year = y - 1900, .tm_mon = M - 1, .tm_mday = d, .tm_hour = h + lh, .tm_min = m + lm, .tm_sec = (int)truncf(s)};
 		int ms = (int)truncf((s - truncf(s)) * 1000);
 
